@@ -37,6 +37,7 @@ window.SITE_CONTENT = {
     story: "Our Story",
     albums: "Photo Albums",
     more: "More About Us",
+    feed: "Our Feed",
   },
 
   /* -------------------------------------------------------------------
@@ -334,11 +335,12 @@ window.SITE_CONTENT = {
     intro: "Little snapshots from our everyday life: what we've been up to lately.",
     previewCount: 6,                    // How many posts the Home page shows (6 fits neatly)
     buttonText: "Explore our feed",
+    showLatestOnHome: true,             // Show the newest post as a small card in the welcome section (true / false)
+    latestLabel: "Latest from our feed",
     avatar: "assets/images/hero/sunset-together.jpg", // The round photo at the top of the Feed page
     page: {
       title: "Our Feed",
       intro: "Everyday moments, small adventures and the things that make us smile. Tap any photo to see the whole post.",
-      backText: "Back to home",
     },
     // PLACEHOLDER — the dates and texts below are examples. Replace them with your own.
     posts: [

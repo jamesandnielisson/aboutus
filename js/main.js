@@ -257,6 +257,26 @@
   setText("feed-intro", feed.intro);
   $("feed-button").querySelector("span").textContent = feed.buttonText || "Explore our feed";
   if (!feedPosts.length) $("feed").hidden = true;
+
+  // Sneak peek of the newest post in the welcome section
+  var latest = feedPosts[0];
+  if (latest && feed.showLatestOnHome !== false) {
+    var peek = $("hero-peek");
+    peek.href = "feed.html#" + latest.id;
+    [
+      el("span", { className: "hero-peek__thumb" }, [image(latest.src, "", { loading: "eager" })]),
+      el("span", { className: "hero-peek__body" }, [
+        el("span", { className: "hero-peek__label" }, [
+          el("span", { className: "hero-peek__dot", "aria-hidden": "true" }),
+          feed.latestLabel || "Latest from our feed",
+        ]),
+        el("span", { className: "hero-peek__text", text: latest.text[0] || latest.alt }),
+        latest.dateText ? el("span", { className: "hero-peek__date", text: latest.dateText }) : null,
+      ]),
+    ].forEach(function (node) { peek.appendChild(node); });
+    peek.insertAdjacentHTML("beforeend", '<svg class="hero-peek__arrow" aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><path d="M5 12h14m0 0-6-6m6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+    peek.hidden = false;
+  }
   feedPosts.slice(0, feed.previewCount || 6).forEach(function (post) {
     $("feed-grid").appendChild(el("li", { className: "reveal" }, [
       el("a", { className: "feed-tile", href: "feed.html#" + post.id }, [

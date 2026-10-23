@@ -58,7 +58,9 @@
 
   document.title = (page.title || "Our Feed") + (C.names ? " · " + C.names : "");
   document.querySelectorAll('[data-content="names"]').forEach(function (n) { n.textContent = C.names || ""; });
-  $("feed-back").querySelector("span").textContent = page.backText || "Back to home";
+  document.querySelectorAll("[data-menu]").forEach(function (link) {
+    link.textContent = (C.menu && C.menu[link.dataset.menu]) || link.dataset.menu;
+  });
 
   setText("feed-page-title", page.title || feed.heading || "Our Feed");
   setText("feed-page-intro", page.intro);
@@ -92,7 +94,28 @@
   setText("footer-text", C.footer);
   setText("footer-year", String(new Date().getFullYear()));
 
+  /* =====================================================================
+     MENU
+     ===================================================================== */
   var header = $("site-header");
+  var toggle = document.querySelector(".nav__toggle");
+  var menu = $("nav-menu");
+
+  function setMenu(open) {
+    toggle.setAttribute("aria-expanded", String(open));
+    menu.classList.toggle("is-open", open);
+  }
+  toggle.addEventListener("click", function () {
+    setMenu(toggle.getAttribute("aria-expanded") !== "true");
+  });
+  menu.addEventListener("click", function (e) { if (e.target.closest("a")) setMenu(false); });
+  document.addEventListener("click", function (e) {
+    if (menu.classList.contains("is-open") && !e.target.closest(".nav")) setMenu(false);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && menu.classList.contains("is-open")) { setMenu(false); toggle.focus(); }
+  });
+
   function onScroll() { header.classList.toggle("is-scrolled", window.scrollY > 8); }
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
