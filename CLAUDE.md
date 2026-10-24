@@ -1,7 +1,9 @@
 # CLAUDE.md — project handbook (read first, update last)
 
 Personal "about us" website for **James & Nielisson**. Plain HTML/CSS/JS, no build step, no dependencies.
-Hosted on GitHub Pages from `main` / root → remote `https://github.com/jamesandnielisson/aboutus.git`.
+Hosted on GitHub Pages from `main` / root at **https://jamesandnielisson.github.io/** → remote
+`https://github.com/jamesandnielisson/jamesandnielisson.github.io.git` (repo renamed from `aboutus` on 2026-10-24; the old
+`/aboutus/` URL no longer works). The local folder is still named `aboutus`, which doesn't matter.
 The owner is not a developer: `README.md` is the owner-facing guide (keep it in sync when behaviour changes).
 
 ## Working rules for Claude
@@ -14,7 +16,8 @@ The owner is not a developer: `README.md` is the owner-facing guide (keep it in 
 5. Anything added to `index.html` that also exists on `feed.html` (header/menu, footer) must be mirrored in both,
    and the JS for it lives in both `main.js` and `feed.js` (they are not shared).
 6. Test by opening `index.html` / `feed.html` directly in a browser (`file://` works; YouTube/Vimeo embeds won't).
-7. Commit only when asked. Commit messages so far are terse ("maj"); use clearer ones when committing for the owner.
+7. Never commit or push unless explicitly asked, and don't offer to; the owner does git themselves.
+8. All site URLs are relative (no leading `/`), so the site works both at `/aboutus/` and at a domain root.
 
 ## File map
 | File | Role |
@@ -57,6 +60,7 @@ Script load order on both pages: `content.js` → `feed-posts.js` → `main.js` 
 - [ ] Video-post support not yet checked in a real browser (owner to verify, incl. on a phone).
 
 ## Change log (newest first)
+- **2026-10-24** — Repo renamed on GitHub to `jamesandnielisson.github.io` (site now at the root URL); local `origin` updated to match.
 - **2026-10-24** — Feed posts can now be videos (`video:` field; optional `image:` = cover). Touched `feed-posts.js`, `main.js`
   (`postThumb`, `playBadge`, feed tiles + hero peek), `feed.js` (tiles, dialog video, `stopVideo`), `feed.html` (`#post-video`),
   `styles.css` (video sizing, `.feed-tile__play`), `content.js` (docs + first video post: Brazil vacation), README.
