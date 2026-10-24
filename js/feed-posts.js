@@ -17,7 +17,7 @@
 
   var usedIds = {};
   function makeId(post) {
-    var base = String(post.id || post.image.split("/").pop().replace(/\.[^.]+$/, ""))
+    var base = String(post.id || (post.video || post.image).split("/").pop().replace(/\.[^.]+$/, ""))
       .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "post";
     var id = base, n = 2;
     while (usedIds[id]) id = base + "-" + n++;
@@ -25,13 +25,14 @@
     return id;
   }
 
-  var posts = (feed.posts || []).filter(function (p) { return p && p.image; }).map(function (p, i) {
+  var posts = (feed.posts || []).filter(function (p) { return p && (p.image || p.video); }).map(function (p, i) {
     var date = parseDate(p.date);
     if (p.date && !date) console.warn('Feed post date should look like "2026-10-19" — check content.js: ' + p.date);
     var text = [].concat(p.text || []);
     return {
       id: makeId(p),
-      src: p.image,
+      src: p.image || "",        // photo, or the cover of a video post (optional for videos)
+      video: p.video || "",
       alt: p.alt || text[0] || "A post from our feed",
       text: text,
       place: p.place || "",

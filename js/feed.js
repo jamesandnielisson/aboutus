@@ -48,6 +48,19 @@
     return img;
   }
 
+  // A post's thumbnail: its photo, or else the first frame of its video
+  function postThumb(post) {
+    if (post.src) return image(post.src, "");
+    return el("video", { src: post.video + "#t=0.1", muted: "", playsinline: "", preload: "metadata", "aria-hidden": "true" });
+  }
+
+  // Small ▶ badge shown on video posts
+  function playBadge() {
+    var badge = el("span", { className: "feed-tile__play", "aria-hidden": "true" });
+    badge.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14"><path d="M8 5.5v13l11-6.5-11-6.5Z" fill="currentColor"/></svg>';
+    return badge;
+  }
+
   /* =====================================================================
      BUILD THE PAGE
      ===================================================================== */
@@ -79,9 +92,10 @@
       className: "feed-tile",
       type: "button",
       id: post.id,
-      "aria-label": "Open post" + (post.dateText ? " from " + post.dateText : "") + ": " + post.alt,
+      "aria-label": "Open " + (post.video ? "video " : "") + "post" + (post.dateText ? " from " + post.dateText : "") + ": " + post.alt,
     }, [
-      image(post.src, ""),
+      postThumb(post),
+      post.video ? playBadge() : null,
       el("span", { className: "feed-tile__overlay", "aria-hidden": "true" }, [
         post.dateText ? el("span", { className: "feed-tile__date", text: post.dateText }) : null,
         el("span", { className: "feed-tile__text", text: post.text[0] || "" }),
@@ -125,6 +139,7 @@
      ===================================================================== */
   var dialog = $("post-dialog");
   var postImg = $("post-img");
+  var postVideo = $("post-video");
   var prevBtn = $("post-prev");
   var nextBtn = $("post-next");
   var current = 0;
@@ -132,11 +147,22 @@
   function showPost(i) {
     current = (i + posts.length) % posts.length; // wraps around at the ends
     var post = posts[current];
-    postImg.classList.add("is-loading");
-    postImg.onload = function () { postImg.classList.remove("is-loading"); };
-    postImg.onerror = postImg.onload;
-    postImg.src = post.src;
-    postImg.alt = post.alt;
+    stopVideo();
+    postImg.hidden = !!post.video;
+    postVideo.hidden = !post.video;
+    if (post.video) {
+      // Never autoplays; the photo (if any) is shown until play is pressed
+      if (post.src) postVideo.setAttribute("poster", post.src);
+      else postVideo.removeAttribute("poster");
+      postVideo.src = post.src ? post.video : post.video + "#t=0.1";
+      postVideo.setAttribute("aria-label", post.alt);
+    } else {
+      postImg.classList.add("is-loading");
+      postImg.onload = function () { postImg.classList.remove("is-loading"); };
+      postImg.onerror = postImg.onload;
+      postImg.src = post.src;
+      postImg.alt = post.alt;
+    }
     setText("post-place", post.place);
     $("post-place").hidden = !post.place;
     var text = $("post-text");
@@ -149,9 +175,20 @@
     history.replaceState(null, "", "#" + post.id);
     // Load the neighbouring photos in the background so browsing feels instant
     [current + 1, current - 1].forEach(function (n) {
-      new Image().src = posts[(n + posts.length) % posts.length].src;
+      var src = posts[(n + posts.length) % posts.length].src;
+      if (src) new Image().src = src;
     });
   }
+
+  function stopVideo() {
+    postVideo.pause();
+    postVideo.removeAttribute("src");
+    postVideo.load(); // stops the download too
+  }
+
+  postVideo.addEventListener("error", function () {
+    if (postVideo.getAttribute("src")) console.warn("Video not found or not playable — check the path in content.js: " + postVideo.src);
+  });
 
   function openPost(i) {
     var single = posts.length < 2;
@@ -169,11 +206,12 @@
   // Clicking the dark area around the post closes it
   dialog.addEventListener("click", function (e) { if (e.target === dialog) dialog.close(); });
   dialog.addEventListener("keydown", function (e) {
-    if (posts.length < 2) return;
+    if (posts.length < 2 || e.target === postVideo) return; // arrows on the video seek instead
     if (e.key === "ArrowLeft") { e.preventDefault(); showPost(current - 1); }
     if (e.key === "ArrowRight") { e.preventDefault(); showPost(current + 1); }
   });
   dialog.addEventListener("close", function () {
+    stopVideo();
     document.documentElement.style.overflow = "";
     history.replaceState(null, "", location.pathname + location.search);
     var tile = document.getElementById(posts[current].id);
@@ -183,7 +221,10 @@
   // Swipe left/right on the photo on touch screens
   var media = $("post-media");
   var startX = null, startY = null;
-  media.addEventListener("pointerdown", function (e) { startX = e.clientX; startY = e.clientY; });
+  media.addEventListener("pointerdown", function (e) {
+    if (e.target === postVideo) return; // dragging the video's timeline is not a swipe
+    startX = e.clientX; startY = e.clientY;
+  });
   media.addEventListener("pointerup", function (e) {
     if (startX === null || posts.length < 2) return;
     var dx = e.clientX - startX, dy = e.clientY - startY;

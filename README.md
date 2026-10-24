@@ -24,7 +24,6 @@ assets/
       animals/
       everyday-moments/
     OurPhotos/          Your original, full-size photos (not used by the site — see note below)
-    more/               Photos for the "More About Us" cards
     feed/               Photos for your Feed posts (create it when you add your first one)
     closing/            Photos for the closing collage
   videos/               Your introduction video (and its poster image)
@@ -118,7 +117,7 @@ A few rules keep things working:
 4. Albums appear in the order they're listed. To remove an album, delete its whole block, from `{` to `},`.
 
 ### Our Feed (Instagram-style posts)
-Short posts about your everyday life. The Home page shows the newest few (below "More About Us"), and the **Explore our feed** button opens `feed.html`, which shows them all.
+Short posts about your everyday life. The Home page shows the newest few (below the Photo Albums), and the **Explore our feed** button opens `feed.html`, which shows them all.
 
 1. Copy the photo into `assets/images/feed/` (create the folder the first time). Photos already used in an album can be reused too.
 2. In `content.js`, find `feed → posts` and add a block anywhere in the list:
@@ -131,13 +130,18 @@ Short posts about your everyday life. The Home page shows the newest few (below 
      text: "Sunday pancakes are a non-negotiable in this house.",
    },
    ```
+   **A video post** works the same way. Copy the `.mp4` into `assets/videos/` and write `video:` instead of `image:`:
+   ```js
+   {
+     video: "assets/videos/our-trip.mp4",
+     alt: "Short video of our trip to the mountains",
+     date: "2026-11-02",
+     text: "A few minutes of our favourite trip.",
+   },
+   ```
+   Video posts show a small ▶ on their tile, and they only play when someone presses play. If you also add an `image:`, that photo is used as the cover. Otherwise the first frame of the video is shown. Keep feed videos small (ideally under 25 MB) so they load fast on phones.
 3. Posts are sorted by `date`, newest first, so you never need to reorder them.
 4. `previewCount` sets how many posts the Home page shows. **6** looks best: one row on computers, two rows of three on phones.
-
-### "More About Us" cards
-Each card has an `icon`, a `title`, a `text` and an optional `image`. Available icons:
-`heart, home, leaf, sun, book, compass, star, coffee, music, paw, gift, smile`.
-Add, remove or reorder cards just like albums.
 
 ---
 

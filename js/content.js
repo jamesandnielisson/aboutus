@@ -36,7 +36,6 @@ window.SITE_CONTENT = {
     home: "Home",
     story: "Our Story",
     albums: "Photo Albums",
-    more: "More About Us",
     feed: "Our Feed",
   },
 
@@ -261,51 +260,6 @@ window.SITE_CONTENT = {
   },
 
   /* -------------------------------------------------------------------
-     SECTION 5 — MORE ABOUT US
-     Small cards. Each card has an icon, a title, a short text and an
-     optional photo. Available icons:
-       heart, home, leaf, sun, book, compass, star, coffee, music, paw, gift, smile
-     ------------------------------------------------------------------- */
-  more: {
-    heading: "More About Us",
-    intro: "The little things that make us, us.",
-    cards: [
-      {
-        icon: "leaf",
-        title: "Our interests & hobbies",
-        text: "This is where we'll share the hobbies and interests we each enjoy.", // PLACEHOLDER
-      },
-      {
-        icon: "sun",
-        title: "An ordinary weekend",
-        text: "Here we'll describe what a typical weekend looks like for us.", // PLACEHOLDER
-        image: { src: "assets/images/more/weekend.jpg", alt: "Paddling a canoe together on a lake" },
-      },
-      {
-        icon: "heart",
-        title: "Things that make us happy",
-        text: "A few of the simple things that always bring us joy.", // PLACEHOLDER
-      },
-      {
-        icon: "gift",
-        title: "Family traditions",
-        text: "The traditions we cherish and look forward to passing on.", // PLACEHOLDER
-        image: { src: "assets/images/more/traditions.jpg", alt: "Christmas dinner with family, all wearing paper crowns" },
-      },
-      {
-        icon: "coffee",
-        title: "Our favourite activities",
-        text: "The things we love doing together, at home and out in the world.", // PLACEHOLDER
-      },
-      {
-        icon: "star",
-        title: "Our hopes for the future",
-        text: "Here we'll share what we're dreaming of for the years ahead.", // PLACEHOLDER
-      },
-    ],
-  },
-
-  /* -------------------------------------------------------------------
      SECTION 5b — OUR FEED
      -------------------------------------------------------------------
      Little Instagram-style posts about our everyday life. The Home page
@@ -314,7 +268,12 @@ window.SITE_CONTENT = {
      Each post has:
        image  — the photo (any folder works; new photos can go in
                 assets/images/feed/)
-       alt    — a short description of the photo
+       video  — (instead of, or as well as, image) an .mp4 video, e.g.
+                "assets/videos/our-trip.mp4". If you also give an image,
+                it is shown as the cover until play is pressed;
+                without one, the video's first frame is used.
+                Keep videos under ~25 MB so they load quickly.
+       alt    — a short description of the photo or video
        date   — written as "YYYY-MM-DD", e.g. "2026-10-19".
                 Posts are sorted newest first automatically, so the
                 order in this list doesn't matter.
@@ -328,6 +287,14 @@ window.SITE_CONTENT = {
             date: "2026-10-26",
             place: "Home",
             text: "Sunday pancakes are a non-negotiable in this house.",
+          },
+
+     ▶ EXAMPLE — a video post:
+          {
+            video: "assets/videos/our-trip.mp4",
+            alt: "Short video of our trip to the mountains",
+            date: "2026-11-02",
+            text: "A few minutes of our favourite trip.",
           },
      ------------------------------------------------------------------- */
   feed: {
@@ -344,6 +311,13 @@ window.SITE_CONTENT = {
     },
     // PLACEHOLDER — the dates and texts below are examples. Replace them with your own.
     posts: [
+      {
+        video: "assets/videos/Our_Vacation_2023-2024_Brazil.mp4",
+        alt: "Video of our vacation in Brazil, 2023–2024",
+        date: "2026-10-24",
+        place: "Brazil",
+        text: "Our vacation in Brazil, 2023–2024.", // PLACEHOLDER — write your own words
+      },
       {
         image: "assets/images/albums/everyday-moments/reading-corner.jpg",
         alt: "Reading on a cosy beanbag",

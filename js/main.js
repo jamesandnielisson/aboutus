@@ -58,26 +58,17 @@
     return img;
   }
 
-  // Simple line icons for the "More About Us" cards
-  var ICONS = {
-    heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/>',
-    home: '<path d="M4 11 12 4l8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-5h4v5"/>',
-    leaf: '<path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"/><path d="M5 19 13 11"/>',
-    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
-    book: '<path d="M4 5a2 2 0 0 1 2-2h13v15H6a2 2 0 0 0-2 2V5Z"/><path d="M4 20a2 2 0 0 0 2 1h13v-3"/>',
-    compass: '<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5 5-2Z"/>',
-    star: '<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/>',
-    coffee: '<path d="M4 9h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V9Z"/><path d="M17 11h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3v3M12 3v3"/>',
-    music: '<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
-    paw: '<circle cx="7" cy="9" r="1.8"/><circle cx="11" cy="5.5" r="1.8"/><circle cx="16" cy="6.5" r="1.8"/><circle cx="18.5" cy="11" r="1.8"/><path d="M8 17c0-3 2-5.5 4.5-5.5S17 14 17 17a2.5 2.5 0 0 1-3.5 2.3 3 3 0 0 0-2 0A2.5 2.5 0 0 1 8 17Z"/>',
-    gift: '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v8h14v-8M12 8v12"/><path d="M12 8S10.5 3.5 8 4.5 9 8 12 8Zm0 0s1.5-4.5 4-3.5S15 8 12 8Z"/>',
-    smile: '<circle cx="12" cy="12" r="9"/><path d="M8.5 14a4 4 0 0 0 7 0"/><path d="M9 9.5h.01M15 9.5h.01"/>',
-  };
-  function icon(name) {
-    var span = el("span", { className: "more-card__icon", "aria-hidden": "true" });
-    span.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' +
-      (ICONS[name] || ICONS.heart) + "</svg>";
-    return span;
+  // A feed post's thumbnail: its photo, or else the first frame of its video
+  function postThumb(post, alt, props) {
+    if (post.src) return image(post.src, alt, props);
+    return el("video", { src: post.video + "#t=0.1", muted: "", playsinline: "", preload: "metadata", "aria-hidden": "true" });
+  }
+
+  // Small ▶ badge shown on video posts
+  function playBadge() {
+    var badge = el("span", { className: "feed-tile__play", "aria-hidden": "true" });
+    badge.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14"><path d="M8 5.5v13l11-6.5-11-6.5Z" fill="currentColor"/></svg>';
+    return badge;
   }
 
   /* =====================================================================
@@ -233,23 +224,6 @@
     ]));
   });
 
-  /* ---------- 5. More about us ---------- */
-  var more = C.more || {};
-  setText("more-title", more.heading);
-  setText("more-intro", more.intro);
-  (more.cards || []).forEach(function (card) {
-    var text = el("div", { className: "more-card__text" });
-    paragraphs(text, card.text);
-    $("more-grid").appendChild(el("li", { className: "reveal" }, [
-      el("article", { className: "more-card" }, [
-        icon(card.icon),
-        el("h3", { className: "more-card__title", text: card.title }),
-        text,
-        card.image && card.image.src ? image(card.image.src, card.image.alt, { className: "more-card__img" }) : null,
-      ]),
-    ]));
-  });
-
   /* ---------- 5b. Feed preview ---------- */
   var feed = C.feed || {};
   var feedPosts = window.FEED_POSTS || [];
@@ -264,7 +238,7 @@
     var peek = $("hero-peek");
     peek.href = "feed.html#" + latest.id;
     [
-      el("span", { className: "hero-peek__thumb" }, [image(latest.src, "", { loading: "eager" })]),
+      el("span", { className: "hero-peek__thumb" }, [postThumb(latest, "", { loading: "eager" })]),
       el("span", { className: "hero-peek__body" }, [
         el("span", { className: "hero-peek__label" }, [
           el("span", { className: "hero-peek__dot", "aria-hidden": "true" }),
@@ -279,8 +253,9 @@
   }
   feedPosts.slice(0, feed.previewCount || 6).forEach(function (post) {
     $("feed-grid").appendChild(el("li", { className: "reveal" }, [
-      el("a", { className: "feed-tile", href: "feed.html#" + post.id }, [
-        image(post.src, post.alt),
+      el("a", { className: "feed-tile", href: "feed.html#" + post.id, "aria-label": (post.video ? "Video: " : "") + post.alt }, [
+        postThumb(post, post.alt),
+        post.video ? playBadge() : null,
         el("span", { className: "feed-tile__overlay", "aria-hidden": "true" }, [
           post.dateText ? el("span", { className: "feed-tile__date", text: post.dateText }) : null,
           el("span", { className: "feed-tile__text", text: post.text[0] || "" }),
