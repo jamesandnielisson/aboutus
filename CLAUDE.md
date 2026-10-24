@@ -60,6 +60,9 @@ Script load order on both pages: `content.js` → `feed-posts.js` → `main.js` 
 - [ ] Video-post support not yet checked in a real browser (owner to verify, incl. on a phone).
 
 ## Change log (newest first)
+- **2026-10-24** — Livelier "Latest from our feed" card (CSS only): pulsing green dot (`--live` token, `live-ping`/`live-glow`),
+  rotating conic-gradient story ring on the thumbnail (`spin`, faster on hover), green glow on hover. Looping animations are
+  explicitly disabled under `prefers-reduced-motion` (the global .01ms rule would make them flicker).
 - **2026-10-24** — Repo renamed on GitHub to `jamesandnielisson.github.io` (site now at the root URL); local `origin` updated to match.
 - **2026-10-24** — Feed posts can now be videos (`video:` field; optional `image:` = cover). Touched `feed-posts.js`, `main.js`
   (`postThumb`, `playBadge`, feed tiles + hero peek), `feed.js` (tiles, dialog video, `stopVideo`), `feed.html` (`#post-video`),

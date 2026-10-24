@@ -16,6 +16,7 @@
   --sage-darker: #3c4c36;
   --clay: #c08268;        /* decorative accent */
   --clay-dark: #8c5039;   /* small accent text */
+  --live: #34c463;        /* the pulsing "live" light on the latest feed post */
   --white: #fff;
 
   /* Fonts */
@@ -290,15 +291,37 @@ button { font: inherit; color: inherit; }
   transition: transform .3s var(--ease), border-color .3s, box-shadow .3s var(--ease);
 }
 .hero-peek[hidden] { display: none; }
-.hero-peek:hover { transform: translateY(-3px); border-color: var(--sage); box-shadow: var(--shadow-lg); }
-.hero-peek__thumb {
-  flex-shrink: 0;
-  width: 60px; height: 60px;
-  padding: 2px;
-  border-radius: 14px;
-  box-shadow: 0 0 0 2px var(--clay);   /* same "story ring" as the Feed page */
+.hero-peek:hover {
+  transform: translateY(-3px);
+  border-color: var(--live);
+  box-shadow: var(--shadow-lg), 0 0 0 4px rgba(52, 196, 99, .14);
 }
-.hero-peek__thumb img, .hero-peek__thumb video { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 11px; background: var(--sand); }
+/* Thumbnail with a slowly turning colourful "story ring" */
+.hero-peek__thumb {
+  position: relative;
+  isolation: isolate;
+  flex-shrink: 0;
+  width: 62px; height: 62px;
+  padding: 3px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.hero-peek__thumb::before {
+  content: "";
+  position: absolute; inset: -50%;
+  z-index: -1;
+  background: conic-gradient(var(--live), var(--sage), var(--clay), #e6b35a, var(--live));
+  animation: spin 5s linear infinite;
+}
+.hero-peek:hover .hero-peek__thumb::before { animation-duration: 1.6s; }
+.hero-peek__thumb img, .hero-peek__thumb video {
+  display: block;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border: 2px solid var(--white);
+  border-radius: 13px;
+  background: var(--sand);
+}
 .hero-peek__body { display: flex; flex-direction: column; gap: .15rem; flex: 1; min-width: 0; }
 .hero-peek__label {
   display: flex; align-items: center; gap: .45rem;
@@ -307,12 +330,21 @@ button { font: inherit; color: inherit; }
   line-height: 1.4;
 }
 .hero-peek__date { color: var(--muted); font-size: .8rem; line-height: 1.3; }
+/* Pulsing green "live" light */
 .hero-peek__dot {
+  position: relative;
   flex-shrink: 0;
-  width: 7px; height: 7px;
+  width: 8px; height: 8px;
   border-radius: 50%;
-  background: var(--sage);
-  box-shadow: 0 0 0 3px #e8ede3;
+  background: var(--live);
+  animation: live-glow 1.8s ease-in-out infinite;
+}
+.hero-peek__dot::after {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background: var(--live);
+  animation: live-ping 1.8s cubic-bezier(0, 0, .2, 1) infinite;
 }
 .hero-peek__text {
   display: -webkit-box;
@@ -778,6 +810,12 @@ dialog::backdrop { background: rgba(35, 31, 27, .6); }
 
 @keyframes pop-in { from { opacity: 0; transform: translateY(16px) scale(.98); } }
 @keyframes fade-in { from { opacity: 0; } }
+@keyframes spin { to { transform: rotate(1turn); } }
+@keyframes live-ping { 75%, 100% { transform: scale(3.2); opacity: 0; } }
+@keyframes live-glow {
+  0%, 100% { box-shadow: 0 0 2px rgba(52, 196, 99, .6); }
+  50% { box-shadow: 0 0 8px 1px rgba(52, 196, 99, .9); }
+}
 
 /* ---------- Respect "reduce motion" settings ---------- */
 @media (prefers-reduced-motion: reduce) {
@@ -787,4 +825,7 @@ dialog::backdrop { background: rgba(35, 31, 27, .6); }
     transition-duration: .01ms !important;
   }
   .reveal { opacity: 1; transform: none; }
+  /* Looping animations would flicker at .01ms, so switch them off */
+  .hero-peek__dot, .hero-peek__dot::after, .hero-peek__thumb::before { animation: none !important; }
+  .hero-peek__dot::after { opacity: 0; }
 }
